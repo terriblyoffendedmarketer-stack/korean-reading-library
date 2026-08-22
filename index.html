@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#5B8C6F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Korean Books">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Korean Reading Library</title>
+<style>
+:root {
+  --ground: #FAFAF7;
+  --surface: #FFFFFF;
+  --text: #2C2B28;
+  --text-secondary: #6B6660;
+  --border: #E8E5E0;
+  --accent: #5B8C6F;
+  --accent-soft: #EDF5F0;
+  --beginner: #5B8C6F;
+  --beginner-bg: #EDF5F0;
+  --intermediate: #B8860B;
+  --intermediate-bg: #FDF6E3;
+  --advanced: #B85C3A;
+  --advanced-bg: #FDF0EB;
+  --search-bg: #F2F0EC;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #1C1C1E;
+    --surface: #2A2A2C;
+    --text: #E8E6E1;
+    --text-secondary: #9B9890;
+    --border: #3A3A3C;
+    --accent: #7DB592;
+    --accent-soft: #1E2E25;
+    --beginner: #7DB592;
+    --beginner-bg: #1E2E25;
+    --intermediate: #D4A843;
+    --intermediate-bg: #2E2710;
+    --advanced: #D4735A;
+    --advanced-bg: #2E1C14;
+    --search-bg: #2A2A2C;
+    --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.1);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #1C1C1E;
+  --surface: #2A2A2C;
+  --text: #E8E6E1;
+  --text-secondary: #9B9890;
+  --border: #3A3A3C;
+  --accent: #7DB592;
+  --accent-soft: #1E2E25;
+  --beginner: #7DB592;
+  --beginner-bg: #1E2E25;
+  --intermediate: #D4A843;
+  --intermediate-bg: #2E2710;
+  --advanced: #D4735A;
+  --advanced-bg: #2E1C14;
+  --search-bg: #2A2A2C;
+  --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  line-height: 1.6;
+  padding: 2rem 1.5rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 2rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100dvh;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.25rem;
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.search-wrap {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--ground);
+  padding: 0.5rem 0 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.search-wrap svg {
+  position: absolute;
+  left: 0.875rem;
+  top: calc(0.5rem + 50%);
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--search-bg);
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.filter-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.filter-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.book-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s;
+}
+
+.book-card:hover {
+  border-color: var(--accent);
+}
+
+.book-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.book-title-ko {
+  font-family: Georgia, "Apple SD Gothic Neo", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.book-title-en {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.book-meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-beginner {
+  background: var(--beginner-bg);
+  color: var(--beginner);
+}
+
+.badge-intermediate {
+  background: var(--intermediate-bg);
+  color: var(--intermediate);
+}
+
+.badge-advanced {
+  background: var(--advanced-bg);
+  color: var(--advanced);
+}
+
+.meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.meta-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.book-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.book-themes {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.theme-tag {
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  background: var(--search-bg);
+  padding: 0.125rem 0.4375rem;
+  border-radius: 3px;
+}
+
+.book-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+  padding: 0.4375rem 0.75rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-download:hover {
+  opacity: 0.75;
+}
+
+.book-download svg {
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+  display: none;
+}
+
+.empty-state.visible {
+  display: block;
+}
+
+.count-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.drive-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.drive-link:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+  body { padding: 1.25rem 1rem; padding-top: calc(env(safe-area-inset-top, 0px) + 1.25rem); }
+  .header h1 { font-size: 1.5rem; }
+  .book-title-ko { font-size: 1.125rem; }
+  .book-card { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Korean Reading Library</h1>
+  <p>13 books &middot; folk tales, children's stories &amp; classic adaptations</p>
+</div>
+
+<div class="search-wrap">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+  </svg>
+  <input type="text" class="search-input" placeholder="Search by title, theme, or difficulty..." id="searchInput">
+</div>
+
+<div class="filter-row">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="beginner">Beginner</button>
+  <button class="filter-btn" data-filter="beginner+">Beginner+</button>
+  <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+  <button class="filter-btn" data-filter="advanced">Advanced</button>
+</div>
+
+<div class="count-label" id="countLabel">Showing 13 books</div>
+
+<div class="book-list" id="bookList"></div>
+
+<div class="empty-state" id="emptyState">
+  No books match your search.
+</div>
+
+<a class="drive-link" href="https://drive.google.com/drive/folders/1rDJJ84V5gVvzRwBHU4Cs-LSTLnJ_C4k5" target="_blank" rel="noopener">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  Open in Google Drive
+</a>
+
+<script>
+const books = [
+  {
+    titleKo: "외국인을 위한 한국어 읽기",
+    titleEn: "Korean Reading for Foreigners",
+    difficulty: "beginner",
+    chars: "~15000",
+    readTime: "45-60 min",
+    description: "OCR'd textbook from the Internet Archive. A structured reader specifically designed for non-native speakers, with graded passages and vocabulary. Multiple short texts of increasing difficulty.",
+    themes: ["textbook", "graded reader", "vocabulary building"],
+    file: "00-korean-fairy-tales-reading.epub",
+    driveId: "1g8I073RYv02a8tYOY6i8teKUq5jcgzSn"
+  },
+  {
+    titleKo: "금도끼",
+    titleEn: "The Golden Axe",
+    difficulty: "beginner",
+    chars: "829",
+    readTime: "3-5 min",
+    description: "A woodcutter drops his axe into a pond. A spirit offers him gold and silver axes, but he honestly says they aren't his. Classic Korean moral tale about honesty being rewarded.",
+    themes: ["honesty", "reward", "folk tale", "short"],
+    file: "01-금도끼.epub",
+    driveId: "1qgrj0ZjyBN1E0BThBPvDJRLD-XwwcbDG"
+  },
+  {
+    titleKo: "호랑이형님",
+    titleEn: "Tiger Brother",
+    difficulty: "beginner+",
+    chars: "2043",
+    readTime: "8-10 min",
+    description: "A man befriends a tiger who becomes like an older brother to him. A uniquely Korean folk tale about unlikely bonds and loyalty between humans and animals.",
+    themes: ["friendship", "animals", "loyalty", "folk tale"],
+    file: "02-호랑이형님.epub",
+    driveId: "1jTxCduWPfC16hkkkQpvJgA5a0pS1fxza"
+  },
+  {
+    titleKo: "시골쥐 서울구경",
+    titleEn: "Country Mouse Visits Seoul",
+    difficulty: "intermediate",
+    chars: "4210",
+    readTime: "15-20 min",
+    description: "Korean adaptation of the country mouse / city mouse fable. A rural mouse visits Seoul and is dazzled by the city life, but discovers that comfort comes with danger. Good everyday vocabulary.",
+    themes: ["city vs country", "contentment", "adaptation", "daily life"],
+    file: "03-시골쥐서울구경.epub",
+    driveId: "1xGg2cp0e3yF7i2phID5lYg3J-6hmXR6C"
+  },
+  {
+    titleKo: "이상한 샘물",
+    titleEn: "The Strange Spring Water",
+    difficulty: "intermediate",
+    chars: "3480",
+    readTime: "12-15 min",
+    description: "An old couple discovers a mysterious spring whose water makes people younger. A cautionary tale about greed — drinking too much has consequences. Gentle humor throughout.",
+    themes: ["greed", "aging", "magic", "humor", "folk tale"],
+    file: "04-이상한샘물.epub",
+    driveId: "1TvdrmGGcuL4BjFBURo2iuKI5MGae5Nq0"
+  },
+  {
+    titleKo: "꼬부랑 할머니",
+    titleEn: "The Hunchbacked Grandmother",
+    difficulty: "beginner",
+    chars: "467",
+    readTime: "2-3 min",
+    description: "The shortest story in the collection. A playful, rhythmic tale about a bent-over grandmother. Repetitive structure makes it perfect for absolute beginners. Almost like a nursery rhyme.",
+    themes: ["rhythmic", "repetition", "nursery tale", "very short"],
+    file: "05-꼬부랑할머니.epub",
+    driveId: "1DycL-3ihd-mvFro6lWmc5GmQDBKf2Bph"
+  },
+  {
+    titleKo: "설떡술떡",
+    titleEn: "Rice Cake Tales",
+    difficulty: "beginner+",
+    chars: "1610",
+    readTime: "6-8 min",
+    description: "A collection of short anecdotes centered around Korean rice cakes (떡). Cultural content about food traditions and the role of rice cakes in Korean celebrations.",
+    themes: ["food", "culture", "traditions", "celebrations"],
+    file: "06-설떡술떡.epub",
+    driveId: "1SQQbDcjudKBOkseXbLm-BAXVJYCUYH5y"
+  },
+  {
+    titleKo: "털보장사",
+    titleEn: "The Selfish Giant",
+    difficulty: "advanced",
+    chars: "7354",
+    readTime: "25-30 min",
+    description: "Oscar Wilde's 'The Selfish Giant' translated into Korean. A giant builds a wall to keep children out of his garden, but winter never leaves until he opens his heart. Literary Korean with rich description.",
+    themes: ["generosity", "seasons", "children", "literary", "Oscar Wilde"],
+    file: "07-털보장사.epub",
+    driveId: "1CabhvbqWjAVygg57XXsbKvaYDFj5g1Hr"
+  },
+  {
+    titleKo: "욕심쟁이 땅차지",
+    titleEn: "The Greedy Land-Grabber",
+    difficulty: "beginner+",
+    chars: "1505",
+    readTime: "5-7 min",
+    description: "Tolstoy's 'How Much Land Does a Man Need?' adapted into simple Korean. A greedy man can have as much land as he can walk around in a day — but his greed drives him to exhaustion.",
+    themes: ["greed", "land", "mortality", "Tolstoy adaptation"],
+    file: "08-욕심쟁이땅차지.epub",
+    driveId: "1HDZUDxsXPRevy1XVA9jnRbtHAT03BRsr"
+  },
+  {
+    titleKo: "선물 아닌 선물",
+    titleEn: "A Gift That's Not a Gift",
+    difficulty: "intermediate",
+    chars: "2972",
+    readTime: "10-12 min",
+    description: "A story about the complexity of gift-giving and social obligations in Korean culture. Explores themes of sincerity vs. formality in relationships.",
+    themes: ["relationships", "culture", "gift-giving", "social norms"],
+    file: "09-선물아닌선물.epub",
+    driveId: "1RzgumtGI5dgKxE5j4FE93h4wo2ryfl3x"
+  },
+  {
+    titleKo: "황소와 도깨비",
+    titleEn: "The Ox and the Goblin",
+    difficulty: "advanced",
+    chars: "8368",
+    readTime: "30-35 min",
+    description: "By modernist author 이상 (Yi Sang), published 1937. A farmer's ox encounters a 도깨비 (Korean goblin). More complex literary style with period vocabulary. The longest and most challenging text in the collection.",
+    themes: ["도깨비", "farming", "literary fiction", "1930s Korea", "이상"],
+    file: "10-황소와도깨비.epub",
+    driveId: "1FchRewic_z7dqUmZOMMEPGAdF97eQlMy"
+  },
+  {
+    titleKo: "헨젤과 그레텔",
+    titleEn: "Hansel & Gretel",
+    difficulty: "intermediate",
+    chars: "~6800",
+    readTime: "22-25 min",
+    description: "The Brothers Grimm classic retold in Korean. Familiar story makes it easier to follow even when vocabulary is challenging. Good for building reading stamina with a plot you already know.",
+    themes: ["fairy tale", "siblings", "survival", "familiar story"],
+    file: "11-헨젤과그레텔.epub",
+    driveId: "1taRvEtzzqAIkjl0gH1mCP-UHF6fV4fbp"
+  },
+  {
+    titleKo: "나비의 꿈",
+    titleEn: "Dream of a Butterfly",
+    difficulty: "intermediate",
+    chars: "3423",
+    readTime: "12-15 min",
+    description: "A philosophical story inspired by Zhuangzi's butterfly dream paradox, rendered in Korean. Explores the boundary between dreams and reality in gentle, contemplative prose.",
+    themes: ["philosophy", "dreams", "identity", "contemplative"],
+    file: "12-나비의꿈.epub",
+    driveId: "1lw2v1hS49LL5Dh-T0gOSOBRiXLScu4Ur"
+  }
+];
+
+const bookList = document.getElementById('bookList');
+const searchInput = document.getElementById('searchInput');
+const countLabel = document.getElementById('countLabel');
+const emptyState = document.getElementById('emptyState');
+const filterBtns = document.querySelectorAll('.filter-btn');
+
+let activeFilter = 'all';
+
+function getDifficultyLabel(d) {
+  if (d === 'beginner') return 'Beginner';
+  if (d === 'beginner+') return 'Beginner+';
+  if (d === 'intermediate') return 'Intermediate';
+  if (d === 'advanced') return 'Advanced';
+  return d;
+}
+
+function getBadgeClass(d) {
+  if (d === 'beginner' || d === 'beginner+') return 'badge-beginner';
+  if (d === 'intermediate') return 'badge-intermediate';
+  if (d === 'advanced') return 'badge-advanced';
+  return '';
+}
+
+function renderBooks() {
+  bookList.innerHTML = '';
+  const query = searchInput.value.toLowerCase().trim();
+
+  let visible = 0;
+  books.forEach(book => {
+    const matchesFilter = activeFilter === 'all' || book.difficulty === activeFilter;
+    const searchTarget = [
+      book.titleKo, book.titleEn, book.difficulty,
+      book.description, ...book.themes
+    ].join(' ').toLowerCase();
+    const matchesSearch = !query || searchTarget.includes(query);
+
+    if (matchesFilter && matchesSearch) {
+      visible++;
+      const card = document.createElement('div');
+      card.className = 'book-card';
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${book.driveId}`;
+      card.innerHTML = `
+        <div class="book-title-row">
+          <span class="book-title-ko">${book.titleKo}</span>
+          <span class="book-title-en">${book.titleEn}</span>
+        </div>
+        <div class="book-meta">
+          <span class="badge ${getBadgeClass(book.difficulty)}">${getDifficultyLabel(book.difficulty)}</span>
+          <span class="meta-dot"></span>
+          <span class="meta-text">${book.chars} chars</span>
+          <span class="meta-dot"></span>
+          <span class="meta-text">${book.readTime}</span>
+        </div>
+        <p class="book-desc">${book.description}</p>
+        <div class="book-themes">
+          ${book.themes.map(t => `<span class="theme-tag">${t}</span>`).join('')}
+        </div>
+        <a class="book-download" href="${downloadUrl}" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download EPUB
+        </a>
+      `;
+      bookList.appendChild(card);
+    }
+  });
+
+  countLabel.textContent = `Showing ${visible} book${visible !== 1 ? 's' : ''}`;
+  emptyState.classList.toggle('visible', visible === 0);
+}
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderBooks();
+  });
+});
+
+searchInput.addEventListener('input', renderBooks);
+
+renderBooks();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>
