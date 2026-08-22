@@ -2,7 +2,7 @@
   "name": "Korean Reading Library",
   "short_name": "Korean Books",
   "description": "Browse Korean folk tales and stories by difficulty",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#FAFAF7",
   "theme_color": "#5B8C6F",

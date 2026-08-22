@@ -611,7 +611,7 @@ searchInput.addEventListener('input', renderBooks);
 renderBooks();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+  navigator.serviceWorker.register('./sw.js');
 }
 </script>
 </body>
